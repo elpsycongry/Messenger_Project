@@ -17,12 +17,11 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
-        var user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+    public AuthenticationResponse register(User requestUser) {
+        User user = User.builder()
+                .name(requestUser.getName())
+                .email(requestUser.getEmail())
+                .password(passwordEncoder.encode(requestUser.getPassword()))
                 .build();
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);

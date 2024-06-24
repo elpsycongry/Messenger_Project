@@ -1,5 +1,6 @@
 package com.example.messenger.security;
 
+import com.example.messenger.user.User;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> registerUser(
-            @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authenticationService.register(request));
+            @RequestBody User user) {
+        return ResponseEntity.ok(authenticationService.register(user));
     }
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> registerUser(
