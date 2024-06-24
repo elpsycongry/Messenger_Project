@@ -1,5 +1,6 @@
 package com.example.messenger.security;
 
+import com.example.messenger.user.UserDetail;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,14 +43,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Phân quyền cho người dùng chưa có token hoặc là chưa được xác thực
         // Để check chưa được xác thực thì hàm get
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            UserDetail userDetail = (UserDetail) this.userDetailsService.loadUserByUsername(userEmail);
             // Nếu user trong token được tạo trùng với userTrong token nhận về
-            boolean isValidToken = jwtService.checkToken(jwt, userDetails);
+            boolean isValidToken = jwtService.checkToken(jwt, userDetail);
             if (isValidToken) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        userDetail,
                         null,
-                        userDetails.getAuthorities()
+                        userDetail.getAuthorities()
                 );
                 authentication.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)

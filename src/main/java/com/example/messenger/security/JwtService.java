@@ -1,11 +1,12 @@
 package com.example.messenger.security;
 
+import com.example.messenger.user.User;
+import com.example.messenger.user.UserDetail;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -24,17 +25,17 @@ public class JwtService {
     }
 
     // Tạo token mà không thêm extraClaims bằng cách tái sử dụng hàm generateToken
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
     // Tạo token và thêm claim bất ký
     public String generateToken(
             Map<String, Object> extraClaims, // Để thêm một thông tin bất kì
-            UserDetails userDetails
+            User userDetails
     ) {
         return Jwts.builder().setClaims(extraClaims)
-                .setSubject(userDetails.getUsername()) // Cho dù là getUsername nhưng vẫn quy định nó là email
+                .setSubject(userDetails.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256 )
@@ -42,9 +43,9 @@ public class JwtService {
     }
 
     // Check xem token có thuộc về user này hay không
-    public boolean checkToken(String token, UserDetails userDetails) {
+    public boolean checkToken(String token, UserDetail userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equals(userDetails.getEmail()) && !isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {

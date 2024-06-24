@@ -25,5 +25,13 @@ public class UserService implements IUserService {
         return userRepository.findAllByRoles(role);
     }
 
+    @Override
+    public User save(User requestUser) {
+
+        return userRepository.save(requestUser);
+    }
+
+
+
 
 }

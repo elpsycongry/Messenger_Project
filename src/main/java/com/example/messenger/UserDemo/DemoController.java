@@ -2,7 +2,6 @@ package com.example.messenger.UserDemo;
 
 import com.example.messenger.user.IUserService;
 import com.example.messenger.user.RoleRepository;
-import com.example.messenger.user.User;
 import com.example.messenger.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class DemoController {
     private UserRepository userRepository;
     @GetMapping
     public ResponseEntity<?> demo() {
-        throw new RuntimeException();
-//        return ResponseEntity.ok( userRepository.findAll());
+//        throw new RuntimeException();
+        return ResponseEntity.ok( userRepository.findAll());
     }
 }

@@ -1,6 +1,7 @@
 package com.example.messenger.token;
 
 import com.example.messenger.user.User;
+import com.example.messenger.user.UserDetail;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
