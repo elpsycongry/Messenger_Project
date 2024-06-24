@@ -1,5 +1,6 @@
 package com.example.messenger.security;
 
+import com.example.messenger.token.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,7 @@ import java.util.List;
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -43,7 +45,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/test").permitAll()
-                        .requestMatchers("/userRole/**").hasAnyAuthority("ROLE_USER")
+                        .requestMatchers("/userRole/**").hasAnyAuthority("ROLE_USER","ROLE_ADMIN")
                 )
                 .authenticationProvider(authenticationProvider)
 //                .exceptionHandling(customizer -> customizer.accessDeniedHandler(customAccessDeniedHandler()))

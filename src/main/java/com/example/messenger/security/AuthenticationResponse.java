@@ -1,5 +1,6 @@
 package com.example.messenger.security;
 
+import com.example.messenger.user.User;
 import lombok.*;
 
 @Data
@@ -7,5 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthenticationResponse {
+    private User user;
     private String token;
 }

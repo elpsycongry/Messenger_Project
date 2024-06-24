@@ -24,6 +24,7 @@ public class UserDetailServiceImp implements UserDetailsService {
         User user = userService.findByEmail(username);
         return UserDetail.builder()
                 .id(user.getId())
+                .email(user.getEmail())
                 .password(user.getPassword())
                 .roles(user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList()))
                 .build();
