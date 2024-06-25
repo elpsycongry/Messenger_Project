@@ -2,6 +2,7 @@ package com.example.messenger.token;
 
 import com.example.messenger.user.User;
 import com.example.messenger.user.UserDetail;
+import com.example.messenger.user.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -22,6 +23,7 @@ import java.util.function.Function;
 public class JwtService {
     private static final String SECRET_KEY = "LW4gJ3siYWxnIjoiRVMyNTYiLCJ0eXAiOiJKV1QifScgDQo";
     private final JwtRepository jwtRepository;
+    private static final int THREE_DAY_MILLIS = 1000 * 60 * 60 * 24 * 3;
     // Subject claims: Subject claim quy định chủ thể của token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject ); // (Claims) -> Claims.getSubject()
@@ -29,18 +31,22 @@ public class JwtService {
 
     // Tạo token mà không thêm extraClaims bằng cách tái sử dụng hàm generateToken
     public String generateToken(User userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        return generateToken(new HashMap<>(), userDetails,THREE_DAY_MILLIS);
+    }
+    public String generateTokenWithMillis(User userDetails, int millis){
+        return generateToken(new HashMap<>(), userDetails,millis);
     }
 
     // Tạo token và thêm claim bất ký
     public String generateToken(
             Map<String, Object> extraClaims, // Để thêm một thông tin bất kì
-            User userDetails
+            User userDetails,
+            int expiresInMillis
     ) {
         return Jwts.builder().setClaims(extraClaims)
                 .setSubject(userDetails.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
+                .setExpiration(new Date(System.currentTimeMillis() + expiresInMillis))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256 )
                 .compact();
     }
