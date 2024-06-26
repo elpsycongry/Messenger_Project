@@ -1,4 +1,4 @@
-package com.example.messenger.mail;
+package com.example.messenger.verificationToken;
 
 import com.example.messenger.token.JwtService;
 import com.example.messenger.user.User;
@@ -13,38 +13,51 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class VerificationTokenServiceImp implements VerificationTokenService{
+public class VerificationTokenServiceImp implements VerificationTokenService {
     private final JwtService jwtService;
     private final VerificationTokenRepository verifyTokenRepo;
     public static final byte[] KEY =
             {118, 106, 107, 122, 76, 99, 69, 83, 101, 103, 82, 101, 116, 75, 101, 127};
+    private final VerificationTokenRepository verificationTokenRepository;
 
     @Override
-    public VerificationToken createVerificationToken(User user) {
+    public VerificationToken createVerificationToken(User user, String action) {
         String token = UUID.randomUUID().toString();
-
         return verifyTokenRepo.save(VerificationToken.builder()
                 .token(token)
+                .user(user)
                 .createAt(LocalDateTime.now())
                 .expiredAt(LocalDateTime.now().plusMinutes(15))
-                .action("verify email")
+                .action(action)
                 .build());
     }
 
     @Override
     public boolean checkVerificationToken(VerificationToken token) {
         Optional<VerificationToken> verificationToken = verifyTokenRepo.findByToken(token.getToken());
+        if (verificationToken.isEmpty()) {
+            return false;
+        }
 
-        return verificationToken.isPresent();
+        if (LocalDateTime.now().isAfter(verificationToken.get().getExpiredAt())) {
+            return false;
+        }
+        // Set token expire time
+        verificationToken.get().setExpiredAt(LocalDateTime.now());
+        verifyTokenRepo.save(verificationToken.get());
+        return true;
     }
 
+    @Override
+    public VerificationToken getVerificationTokenByToken(String token) {
+        return verificationTokenRepository.findByToken(token).orElse(null);
+    }
 
 
     public static String encrypt(String salt, String plainText) {

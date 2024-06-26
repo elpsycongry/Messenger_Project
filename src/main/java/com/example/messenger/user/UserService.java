@@ -10,8 +10,6 @@ public class UserService implements IUserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private UserUnverifiedRepository unverifiedRepository;
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).get();
@@ -29,16 +27,18 @@ public class UserService implements IUserService {
 
     @Override
     public User save(User requestUser) {
-
         return userRepository.save(requestUser);
     }
 
     @Override
-    public UserUnverified saveUnverified(User user) {
-        return unverifiedRepository.save(UserUnverified.builder()
-                .password(user.getPassword())
-                .email(user.getEmail())
-                .build());
+    public boolean checkEmailExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    @Override
+    public User verifyEmail(User user) {
+        user.setStatus("activated");
+        return userRepository.save(user);
     }
 
 

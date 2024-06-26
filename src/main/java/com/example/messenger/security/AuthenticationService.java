@@ -1,20 +1,18 @@
 package com.example.messenger.security;
 
+import com.example.messenger.verificationToken.VerificationTokenService;
 import com.example.messenger.token.JwtRepository;
 import com.example.messenger.token.JwtService;
 import com.example.messenger.token.JwtToken;
 import com.example.messenger.user.IUserService;
 import com.example.messenger.user.User;
-import com.example.messenger.user.UserUnverified;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -24,22 +22,28 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final JwtRepository jwtRepository;
+    private final VerificationTokenService verificationTokenService;
 
-    public UserUnverified register(User requestUser) {
+    public User register(User requestUser) {
         requestUser.setPassword(passwordEncoder.encode(requestUser.getPassword()));
-        return userService.saveUnverified(requestUser);
+        requestUser.setStatus("pending");
+        User userAfterSave = userService.save(requestUser);
+        verificationTokenService.createVerificationToken(userAfterSave, "verify email");
+        return userAfterSave;
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        var user = userService.findByEmail(request.getEmail());
+        if (Objects.equals(user.getStatus(), "pending")){
+            return null;
+        }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()
                 )
         );
-        var user = userService.findByEmail(request.getEmail());
         JwtToken jwtToken = saveNewTokenToUser(user);
-
         return AuthenticationResponse.builder()
                 .user(user)
                 .token(jwtToken.getJwt())

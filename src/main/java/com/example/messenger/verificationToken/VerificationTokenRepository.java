@@ -1,4 +1,4 @@
-package com.example.messenger.mail;
+package com.example.messenger.verificationToken;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

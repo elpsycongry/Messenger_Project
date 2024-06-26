@@ -1,9 +1,7 @@
 package com.example.messenger.security;
 
 import com.example.messenger.user.User;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,15 +18,21 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
             @RequestBody User user) {
-        User userRegistered = authenticationService.register(user);
-
-        return ResponseEntity.ok(userRegistered);
+        User userSaved = authenticationService.register(user);
+        String responseMessage = "Một email đã được gửi tới địa chỉ " + userSaved.getEmail() + " vui lòng truy cập vào gmail và xác nhận";
+        return ResponseEntity.ok(responseMessage);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> registerUser(
+    public ResponseEntity<?> registerUser(
             @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+        AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
+
+        if (authenticationResponse == null) {
+            return ResponseEntity.badRequest().body("Tài khoản chưa được xác thực");
+        }
+
+        return ResponseEntity.ok(authenticationResponse);
     }
 
 }

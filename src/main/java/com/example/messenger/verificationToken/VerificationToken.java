@@ -1,4 +1,4 @@
-package com.example.messenger.mail;
+package com.example.messenger.verificationToken;
 
 import com.example.messenger.user.User;
 import jakarta.persistence.*;
@@ -8,8 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.List;
 
 @Data
 @Builder
@@ -26,7 +24,8 @@ public class VerificationToken {
     private LocalDateTime createAt;
     private LocalDateTime expiredAt;
     private String action;
-
     @ManyToOne
     private User user;
 }
+
+

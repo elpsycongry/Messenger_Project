@@ -11,5 +11,7 @@ public interface IUserService {
 
     User save(User requestUser);
 
-    UserUnverified saveUnverified(User user);
+    boolean checkEmailExists(String email);
+
+    User verifyEmail(User user);
 }
