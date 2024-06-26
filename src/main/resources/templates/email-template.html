@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+<h1 style="color: red" th:text="${mail}"></h1>
+<div style="margin: auto; width: 350px; height: 500px; background-color: #c9c9f6" class="container">
+    <div style="
+        display: flex;
+        flex-direction: column;
+        padding: 12px;
+    " class="wraper">
+        <div class="header">
+            <div
+                    style="color: #5656ff; font-weight: bold"
+            >COTE</div>
+            <div>
+                <img style="width: 100%" src="../static/image/mail_placeholder.jpg" height="1058" width="1920"
+                     alt="mail-placeholder"/>
+            </div>
+        </div>
+        <div class="body">
+            Xin chào <span th:text="${name}">Tùng Chiến</span>
+            <p style="font-weight: bold">
+                Chúng tôi rất vui khi bạn muốn kết nối với Cote!
+            </p>
+            <p>Để xác thực gmail của mình vui lòng nhấn vào nút bên dưới.</p>
+            <div><a style="padding: 12px 24px; background-color: #5656ff; color: white; margin: auto" class="btn">Xác thực Gmail</a>
+            </div>
+            <p>Lưu ý là email sẽ hết hạn sau 15 phút và bạn sẽ phải đăng ký lại để nhận mail.</p>
+        </div>
+        <div class="footer">
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

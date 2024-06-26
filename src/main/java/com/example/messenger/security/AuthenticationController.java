@@ -34,5 +34,4 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(authenticationResponse);
     }
-
 }
