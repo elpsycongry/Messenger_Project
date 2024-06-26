@@ -10,4 +10,6 @@ public interface IUserService {
     Iterable<User> getUserByRole(Role role);
 
     User save(User requestUser);
+
+    UserUnverified saveUnverified(User user);
 }

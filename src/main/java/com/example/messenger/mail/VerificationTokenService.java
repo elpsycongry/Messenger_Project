@@ -4,6 +4,6 @@ import com.example.messenger.user.User;
 
 public interface VerificationTokenService {
     VerificationToken createVerificationToken(User user);
-    boolean checkVerificationToken(String token);
+    boolean checkVerificationToken(VerificationToken token);
 
 }

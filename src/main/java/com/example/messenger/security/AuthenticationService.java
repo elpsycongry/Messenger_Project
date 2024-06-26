@@ -5,12 +5,16 @@ import com.example.messenger.token.JwtService;
 import com.example.messenger.token.JwtToken;
 import com.example.messenger.user.IUserService;
 import com.example.messenger.user.User;
+import com.example.messenger.user.UserUnverified;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.sql.SQLException;
 
 @Service
 @RequiredArgsConstructor
@@ -21,9 +25,9 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtRepository jwtRepository;
 
-    public User register(User requestUser) {
+    public UserUnverified register(User requestUser) {
         requestUser.setPassword(passwordEncoder.encode(requestUser.getPassword()));
-        return userService.save(requestUser);
+        return userService.saveUnverified(requestUser);
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -34,7 +38,7 @@ public class AuthenticationService {
                 )
         );
         var user = userService.findByEmail(request.getEmail());
-        JwtToken jwtToken = saveNewTokentoUser(user);
+        JwtToken jwtToken = saveNewTokenToUser(user);
 
         return AuthenticationResponse.builder()
                 .user(user)
@@ -42,7 +46,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    public JwtToken saveNewTokentoUser(User user){
+    public JwtToken saveNewTokenToUser(User user){
 
         JwtToken jwtToken = null;
         String newToken = jwtService.generateToken(user);

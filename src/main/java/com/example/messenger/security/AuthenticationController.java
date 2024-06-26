@@ -1,7 +1,9 @@
 package com.example.messenger.security;
 
 import com.example.messenger.user.User;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,9 +18,11 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(
+    public ResponseEntity<?> registerUser(
             @RequestBody User user) {
-        return ResponseEntity.ok(authenticationService.register(user));
+        User userRegistered = authenticationService.register(user);
+
+        return ResponseEntity.ok(userRegistered);
     }
 
     @PostMapping("/login")
@@ -26,4 +30,5 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
+
 }

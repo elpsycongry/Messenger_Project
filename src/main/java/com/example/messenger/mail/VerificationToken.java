@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -22,8 +23,9 @@ public class VerificationToken {
     private Long id;
 
     private String token;
-    private ZonedDateTime createAt;
-    private ZonedDateTime expiredAt;
+    private LocalDateTime createAt;
+    private LocalDateTime expiredAt;
+    private String action;
 
     @ManyToOne
     private User user;

@@ -2,9 +2,7 @@ package com.example.messenger.mail;
 
 import com.example.messenger.token.JwtService;
 import com.example.messenger.user.User;
-import com.example.messenger.user.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
@@ -14,25 +12,37 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Base64;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class VerificationTokenServiceImp implements VerificationTokenService{
     private final JwtService jwtService;
-    private final VerificationTokenRepository verifiTokenRepo;
+    private final VerificationTokenRepository verifyTokenRepo;
     public static final byte[] KEY =
             {118, 106, 107, 122, 76, 99, 69, 83, 101, 103, 82, 101, 116, 75, 101, 127};
 
     @Override
-    public String createVerificationToken(User user) {
+    public VerificationToken createVerificationToken(User user) {
+        String token = UUID.randomUUID().toString();
 
-        return jwtService.generateTokenWithMillis(user, 1000 * 60 * 30);
+        return verifyTokenRepo.save(VerificationToken.builder()
+                .token(token)
+                .createAt(LocalDateTime.now())
+                .expiredAt(LocalDateTime.now().plusMinutes(15))
+                .action("verify email")
+                .build());
     }
 
     @Override
-    public boolean checkVerificationToken(String token) {
-        return false;
+    public boolean checkVerificationToken(VerificationToken token) {
+        Optional<VerificationToken> verificationToken = verifyTokenRepo.findByToken(token.getToken());
+
+        return verificationToken.isPresent();
     }
 
 
