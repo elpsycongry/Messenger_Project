@@ -19,8 +19,6 @@ public class MailServiceImp implements MailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("classpath:mail_placeholder.jng")
-    private File placeholder;
     @Autowired
     private SpringTemplateEngine templateEngine;
     @Override
@@ -42,7 +40,6 @@ public class MailServiceImp implements MailService {
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             message.setTo(mail);
-            message.addInline("mail_placeholder.jpg", placeholder);
             String htmlText = templateEngine.process("email-template.html", context);
             message.setSubject("subject");
             message.setText(htmlText, true);
