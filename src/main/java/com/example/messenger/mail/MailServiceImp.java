@@ -37,11 +37,14 @@ public class MailServiceImp implements MailService {
         Context context = new Context();
         context.setVariable("mail", mail);
         context.setVariable("name", mailStructure.getReceiverName());
+        if (mailStructure.getVerifyToken() != null){
+            context.setVariable("token", mailStructure.getVerifyToken());
+        }
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             message.setTo(mail);
             String htmlText = templateEngine.process("email-template.html", context);
-            message.setSubject("subject");
+            message.setSubject(mailStructure.getSubject());
             message.setText(htmlText, true);
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {

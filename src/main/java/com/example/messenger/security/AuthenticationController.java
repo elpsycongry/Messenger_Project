@@ -2,11 +2,15 @@ package com.example.messenger.security;
 
 import com.example.messenger.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,9 +22,17 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
             @RequestBody User user) {
-        User userSaved = authenticationService.register(user);
-        String responseMessage = "Một email đã được gửi tới địa chỉ " + userSaved.getEmail() + " vui lòng truy cập vào gmail và xác nhận";
-        return ResponseEntity.ok(responseMessage);
+        try {
+            User userSaved = authenticationService.register(user);
+            String responseMessage = userSaved.getEmail() ;
+            return ResponseEntity.ok(responseMessage);
+        } catch (IllegalStateException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", e.getMessage());
+            response.put("email", user.getEmail());
+            return ResponseEntity.badRequest().body(response);
+        }
+
     }
 
     @PostMapping("/login")

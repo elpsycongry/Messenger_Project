@@ -16,4 +16,5 @@ public class MailStructure {
     private String body;
     private String text;
     private String receiverName;
+    private String verifyToken;
 }

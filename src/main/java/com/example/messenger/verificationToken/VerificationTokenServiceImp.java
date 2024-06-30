@@ -1,6 +1,7 @@
 package com.example.messenger.verificationToken;
 
 import com.example.messenger.token.JwtService;
+import com.example.messenger.user.IUserService;
 import com.example.messenger.user.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class VerificationTokenServiceImp implements VerificationTokenService {
     private final JwtService jwtService;
     private final VerificationTokenRepository verifyTokenRepo;
+    private final IUserService userService;
     public static final byte[] KEY =
             {118, 106, 107, 122, 76, 99, 69, 83, 101, 103, 82, 101, 116, 75, 101, 127};
     private final VerificationTokenRepository verificationTokenRepository;
@@ -57,6 +59,26 @@ public class VerificationTokenServiceImp implements VerificationTokenService {
     @Override
     public VerificationToken getVerificationTokenByToken(String token) {
         return verificationTokenRepository.findByToken(token).orElse(null);
+    }
+
+    @Override
+    public Optional<VerificationToken> getByUserEmailAndAction(String email, String action) {
+        Optional<User> optionalUser = userService.findByEmail(email);
+        if (optionalUser.isEmpty()){
+            return Optional.empty();
+        }
+        else {
+            return verificationTokenRepository.findByActionContainsAndUser(action, optionalUser.get());
+        }
+    }
+    @Override
+    public VerificationToken updateToken(String email, String action) {
+        Optional<VerificationToken> verificationToken = getByUserEmailAndAction(email, action);
+        if (verificationToken.isEmpty()){
+            return null;
+        }
+        verificationToken.get().setExpiredAt(LocalDateTime.now().plusMinutes(15));
+        return verifyTokenRepo.save(verificationToken.get());
     }
 
 
