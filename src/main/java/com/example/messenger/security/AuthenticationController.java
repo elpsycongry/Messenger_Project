@@ -4,10 +4,7 @@ import com.example.messenger.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +21,12 @@ public class AuthenticationController {
             @RequestBody User user) {
         try {
             User userSaved = authenticationService.register(user);
-            String responseMessage = userSaved.getEmail() ;
-            return ResponseEntity.ok(responseMessage);
+            if (userSaved != null){
+                String responseMessage = userSaved.getEmail() ;
+                return ResponseEntity.ok(responseMessage);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exit !");
+            }
         } catch (IllegalStateException e) {
             Map<String, String> response = new HashMap<>();
             response.put("message", e.getMessage());
