@@ -1,5 +1,6 @@
 package com.example.messenger.security;
 
+import com.example.messenger.token.JwtDTO;
 import com.example.messenger.token.JwtRepository;
 import com.example.messenger.token.JwtService;
 import com.example.messenger.token.JwtToken;
@@ -11,6 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,28 +36,47 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
+
         var user = userService.findByEmail(request.getEmail());
-        JwtToken jwtToken = saveNewTokentoUser(user);
+        JwtToken refreshToken = saveRefreshTokenToUser(user);
+        String jwtToken = jwtService.generateToken(user);
 
         return AuthenticationResponse.builder()
                 .user(user)
-                .token(jwtToken.getJwt())
+                .token(jwtToken)
+                .refreshToken(refreshToken.getJwt())
                 .build();
     }
 
-    public JwtToken saveNewTokentoUser(User user){
-
+    public JwtToken saveRefreshTokenToUser(User user) {
         JwtToken jwtToken = null;
-        String newToken = jwtService.generateToken(user);
-
+        String refreshToken = jwtService.generateRefreshToken(user);
         try {
             jwtToken = jwtRepository.findByUser(user).get();
-            jwtToken.setJwt(newToken);
+            jwtToken.setJwt(refreshToken);
             jwtRepository.save(jwtToken);
         } catch (Exception e) {
-            jwtToken = JwtToken.builder().available(true).jwt(newToken).user(user).build();
+            jwtToken = JwtToken.builder().available(true).jwt(refreshToken).user(user).build();
             jwtRepository.save(jwtToken);
         }
         return jwtToken;
+    }
+
+    public AuthenticationResponse getNewToken(String refreshToken) throws Exception {
+        Optional<JwtToken> token = jwtRepository.findByJwtContains(refreshToken);
+
+        if (token.isEmpty() || !jwtService.checkToken(refreshToken) ){
+            throw new Exception("Token expired");
+        }
+
+        String newRefreshToken = jwtService.reSaveRefreshToken(token.get());
+        String newToken = jwtService.generateToken(token.get().getUser());
+
+        System.out.println(newRefreshToken);
+        System.out.println(newToken);
+        return AuthenticationResponse.builder()
+                .refreshToken(newRefreshToken)
+                .token(newToken)
+                .user(token.get().getUser()).build();
     }
 }

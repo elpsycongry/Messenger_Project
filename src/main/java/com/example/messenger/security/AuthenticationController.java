@@ -2,6 +2,8 @@ package com.example.messenger.security;
 
 import com.example.messenger.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,8 +24,20 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> registerUser(
+    public ResponseEntity<AuthenticationResponse> login(
             @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
+    }
+    @PostMapping("/refreshToken")
+    public ResponseEntity<?> refreshToken(
+            @RequestBody AuthenticationRequest request) {
+        AuthenticationResponse res = null;
+        try {
+             res = authenticationService.getNewToken(request.getRefreshToken());
+        } catch (Exception e){
+            return  new ResponseEntity<>("Refresh Token Expired!", HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok(res);
     }
 }
